@@ -1,0 +1,2024 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Luen / JQuery tests</title>
+        <script src="../luen-0.0.1.js"></script>
+        <script src="lib/utestjs-0.0.1.js"></script>
+        <script src="lib/jquery-2.2.4.js"></script>
+        <!--
+        <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+        -->
+        <style>
+            html {
+                font: 80% arial;
+                color: #333;
+            }
+            #test_div {
+                left: 1px;
+                opacity: 1;
+            }
+            #counter_ok {
+                color: green;
+                font-weight: bold;
+            }
+            #counter_error {
+                color: red;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Luen / JQuery tests</h1>
+        <dl>
+            <dt>All <sup>452</sup></dt>
+                <dd id="counter_all">0</dd>
+            <dt>Ok</dt>
+                <dd id="counter_ok">0</dd>
+            <dt>Error</dt>
+                <dd id="counter_error">0</dd>
+        </dl>
+        <dl id="results"></dl>
+
+        <div id="test_div" class="" data-test=abc style="display: none;"></div>
+
+        <form id="test_form" style="display: none;">
+            <select name="single">
+                <option>a</option>
+                <option>b</option>
+            </select>
+            <br/>
+            <select name="multiple" multiple="multiple">
+                <option selected="selected">a</option>
+                <option>b</option>
+                <option selected="selected">c</option>
+            </select>
+            <br/>
+            <label>check1 <input type="checkbox" name="check" value="a"/></label>
+            <label>check2 <input type="checkbox" name="check" value="b" checked="checked"/></label>
+            <br/>
+            <label>radio1 <input type="radio" name="radio" value="a" checked="checked"/></label>
+            <label>radio1 <input type="radio" name="radio" value="b" checked="checked"/></label>
+            <br/>
+            <input type="text" name="text" value="a"/>
+            <br/>
+            <textarea name="textarea">abc żółć</textarea>
+            <br/>
+            <input type="submit" name="submit" value="a"/>
+        </form>
+
+        <script>
+// static methods
+            // Luen
+            test('Luen assertType', function() {
+                assertType(Luen, 'function');
+            });
+
+            // luen
+            test('luen assertType', function() {
+                assertType(luen, 'function');
+            });
+
+            // luen.VERSION
+            test('luen.VERSION assertSame', function() {
+                assertSame(luen.VERSION, '0.0.1');
+            });
+
+            // luen.REGEX_NOT_WHITE
+            test('luen.REGEX_NOT_WHITE assertType', function() {
+                assertType(luen.REGEX_NOT_WHITE, 'object');
+            });
+
+            // luen.fn
+            test('luen.fn assertSame', function() {
+                luen.fn.someApp = function() { return 'abc'; };
+                assertSame(luen.fn.someApp(), 'abc');
+            });
+
+            test('luen.fn assertType', function() {
+                assertType(luen.fn, 'object');
+            });
+
+            // luen._styleToCase
+            test('luen._styleToCase style assertSame', function() {
+                assertSame(luen._styleToCase('padding-top'), 'paddingTop');
+            });
+
+            test('luen._styleToCase someString assertSame', function() {
+                assertSame(luen._styleToCase('abcDef-xyz-żółć'), 'abcdefXyzŻółć');
+            });
+
+            // luen.extend
+            test('luen.extend objects assertType', function() {
+                var obj1 = { "a": 1, "b": 2 };
+                var obj2 = { "c": 3 };
+                assertType(luen.extend(obj1, obj2), 'object');
+            });
+
+            test('luen.extend objects assertSame', function() {
+                var obj1 = { "a": 1, "b": 2 };
+                var obj2 = { "c": 3 };
+                assertSame(luen.extend(obj1, obj2)['c'], 3);
+            });
+
+            test('luen.extend objects same assertSame', function() {
+                var obj1 = { "a": 1, "b": 2 };
+                var obj2 = { "a": 1, "b": 3 };
+                assertSame(luen.extend(obj1, obj2)['b'], 3);
+            });
+
+            test('luen.extend array object assertSame', function() {
+                var obj1 = [1, 2, 3];
+                var obj2 = { "c": 3 };
+                assertSame(luen.extend(obj1, obj2)['c'], 3);
+            });
+
+            // luen.each
+            test('luen.each object assertType', function() {
+                var arg = { "a": 1, "b": 2 };
+                luen.each(arg, function(key, value) {
+                    assertType(value, 'number');
+                });
+                jQuery.each(arg, function(key, value) {
+                    assertType(value, 'number');
+                });
+            });
+
+            test('luen.each array assertType', function() {
+                var arg = [1, 2];
+                luen.each(arg, function(key, value) {
+                    assertType(value, 'number');
+                });
+                jQuery.each(arg, function(key, value) {
+                    assertType(value, 'number');
+                });
+            });
+
+            // luen.hasParam
+            test('luen.hasParam params true assertSame', function() {
+                assertSame(luen.hasParam('b', 'a=1&b=2c=3'), true);
+            });
+
+            test('luen.hasParam params false assertSame', function() {
+                assertSame(luen.hasParam('d', 'a=1&b=2&c=3'), false);
+            });
+
+            test('luen.hasParam params amp assertSame', function() {
+                assertSame(luen.hasParam('c', 'a=1&b=2&amp;c=3'), false);
+            });
+
+            test('luen.hasParam params empty assertSame', function() {
+                assertSame(luen.hasParam('a', 'a=&b=2'), true);
+            });
+
+            test('luen.hasParam params url assertSame', function() {
+                assertSame(luen.hasParam('someparam'), false);
+            });
+
+            // luen.getParam
+            test('luen.getParam params special assertSame', function() {
+                assertSame(luen.getParam('c', 'a=1&b=2&c=żółć'), 'żółć');
+            });
+
+            test('luen.getParam params empty assertSame', function() {
+                assertSame(luen.getParam('c', 'a=1&b=2&c='), '');
+            });
+
+            test('luen.getParam params assertSame', function() {
+                assertSame(luen.getParam('someparam'), undefined);
+            });
+
+            // luen.selector
+            test('luen.selector query assertSame', function() {
+                assertSame(luen.selector('body')[0].nodeName, 'BODY');
+            });
+
+            test('luen.selector query context assertSame', function() {
+                assertSame(luen.selector('body', document)[0].nodeName, 'BODY');
+            });
+
+            test('luen.selector query assertSame', function() {
+                assertSame(luen.selector('somequery')[0], document.querySelectorAll('somequery')[0]);
+            });
+
+            test('luen.selector query xml assertSame', function() {
+                var xml = '<?xml version="1.0"?><foo><bar></bar><bar></bar></foo>';
+                var arg = (new window.DOMParser()).parseFromString(xml, 'text/xml');
+                assertSame(luen.selector('bar', arg).length, 2);
+            });
+
+            test('luen.selector query array assertException', function() {
+                var arg = ['1', '2', '3'];
+                assertException('SyntaxError', function() {
+                    luen.selector('1', arg);
+                });
+            });
+
+            test('luen.selector query json assertException', function() {
+                var arg = { "a": 1, "b": 2 };
+                assertException('SyntaxError', function() {
+                    luen.selector('a', arg);
+                });
+            });
+
+            // luen.parse
+            test('luen.parse assertException', function() {
+                assertException('TypeError', function() {
+                    luen.parse('', '');
+                });
+            });
+
+            test('luen.parse xml assertType', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                //assertType(luen.parse(arg, 'text/xml'), XMLDocument);
+                assertType(luen.parse(arg, 'text/xml'), 'object');
+            });
+
+            test('luen.parse html assertType', function() {
+                var arg = '<!doctype html><html></html>';
+                //assertType(luen.parse(arg, 'text/html'), HTMLDocument);
+                assertType(luen.parse(arg, 'text/html'), 'object');
+            });
+
+            test('luen.parse json assertType', function() {
+                var arg = '{ "a": 1, "b": 3 }';
+                assertType(luen.parse(arg, 'text/json'), 'object');
+            });
+
+            test('luen.parse empty assertException', function() {
+                assertException('SyntaxError', function() {
+                    luen.parse('', 'text/json');
+                });
+            });
+
+            test('luen.parse params assertType', function() {
+                var arg = 'a=1&b=2&c=3';
+                assertType(luen.parse(arg, 'params'), 'object');
+            });
+
+            test('luen.parse params assertSame', function() {
+                var arg = '?a=1&b=2&c=3';
+                assertSame(luen.parse(arg, 'params').c, '3');
+            });
+
+            test('luen.parse params assertException', function() {
+                var arg = '?a=1=1&b=2&c=3';
+                assertException('SyntaxError', function() {
+                    luen.parse(arg, 'params');
+                });
+            });
+
+            // luen.parseXml
+            test('luen.parseXml xml assertType', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                //assertType(luen.parseXml(arg), XMLDocument);
+                assertType(luen.parseXml(arg), 'object');
+            });
+
+            // luen.parseHtml
+            test('luen.parseHtml html assertType', function() {
+                var arg = '<!doctype html><html></html>';
+                //assertType(luen.parseHtml(arg), HTMLDocument);
+                assertType(luen.parseHtml(arg), 'object');
+            });
+
+            // luen.parseJson
+            test('luen.parseJson json assertType', function() {
+                var arg = '{ "a": 1, "b": 3 }';
+                assertType(luen.parseJson(arg), 'object');
+            });
+
+            // luen.parseParams
+            test('luen.parseParams string assertType', function() {
+                var arg = '?a=1&b=2&c=3';
+                assertType(luen.parseParams(arg), 'object');
+            });
+
+            // luen.parseDom
+            test('luen.parseDom xml assertType', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                //assertType(luen.parseDom(arg), HTMLDocument);
+                assertType(luen.parseDom(arg), 'object');
+            });
+
+            // luen.jsonToString
+            test('luen.jsonToString object assertSame', function() {
+                var arg = { "a": 1, "b": "żółć" };
+                assertSame(luen.jsonToString(arg), '{"a":1,"b":"żółć"}');
+            });
+
+            // luen.effects
+            test('luen.effects assertType', function() {
+                assertType(luen.effects, 'object');
+            });
+
+            test('luen.effects.fade assertType', function() {
+                assertType(luen.effects.fade, 'object');
+            });
+
+            test('luen.effects.fade.hide assertSame', function() {
+                assertSame(luen.effects.fade.hide(luen('#test_div')), luen);
+            });
+
+            test('luen.effects.fade.show assertSame', function() {
+                assertSame(luen.effects['fade'].show(luen('#test_div')), luen);
+            });
+
+            test('luen.effects.fadeX assertType', function() {
+                assertType(luen.effects.fadeX, 'object');
+            });
+
+            test('luen.effects.fadeX.hide assertSame', function() {
+                assertSame(luen.effects.fadeX.hide(luen('#test_div')), luen);
+            });
+
+            test('luen.effects.fadeX.show assertSame', function() {
+                assertSame(luen.effects['fadeX'].show(luen('#test_div')), luen);
+            });
+
+            // luen.ajax
+            //window.onload = function() {
+                test('luen.ajax assertType', function() {
+                    assertType(luen.ajax(window.location + ''), 'object');
+                    assertType(jQuery.ajax(window.location + ''), 'object');
+                });
+
+                test('luen.ajax.done assertType', function() {
+                    assertType(luen.ajax(window.location + '').done(), XMLHttpRequest);
+                    assertType(jQuery.ajax(window.location + '').done(), 'object');
+                });
+
+                test('luen.ajax.done callback args assertType', function() {
+                    luen.ajax(window.location + '').done(function(data, xhr, opt) {
+                        assertType(data, 'string');
+                        assertType(xhr, XMLHttpRequest);
+                        assertType(opt, 'object');
+                    });
+                    jQuery.ajax(window.location + '').done(function(data, status, xhr) {
+                        assertType(data, 'string');
+                        assertType(status, 'string');
+                        assertType(xhr, 'object');
+                    });
+                });
+
+                test('luen.ajax.done get params assertSame', function() {
+                    luen.ajax(window.location + '', {
+                        params: { "a": 1, "b": 2, "_": "żółć" },
+                        cache: false,
+                        method: 'GET'
+                    }).done(function(data, xhr, opt) {
+                        assertSame(opt.params._, 'żółć');
+                    });
+                });
+
+                test('luen.ajax.done post assertSame', function() {
+                    luen.ajax(window.location + '', {
+                        params: { "a": 1, "b": 2, "luen": "żółć" },
+                        method: 'POST',
+                        timeout: 10, // miliseconds
+                        headers: {
+                            "length": 123
+                        },
+                        async: false
+                    }).done(function(data, xhr, opt) {
+                        delete opt.url;
+                        assertSame(JSON.stringify(opt), '{"params":{"a":1,"b":2,"luen":"żółć"},"type":"rawText","method":"POST","headers":{"length":123},"mime":null,"timeout":10,"username":null,"password":null,"cache":true,"async":true}');
+                        assertSame(luen(data).find('#test_div').getAttribute('data-test'), 'abc');
+                    });
+                });
+
+                test('luen.ajax.done default options assertSame', function() {
+                    luen.ajax(window.location + '', {}).done(function(data, xhr, opt) {
+                        delete opt.url;
+                        assertSame(JSON.stringify(opt), '{"params":{},"type":"rawText","method":"GET","headers":{},"mime":null,"timeout":0,"username":null,"password":null,"cache":true,"async":true}');
+                    });
+                });
+
+                // luen.ajaxPost
+                test('luen.ajaxPost type xml assertType', function() {
+                    assertType(luen.ajaxPost('file/xml.xml', 'rawXml'), XMLHttpRequest);
+                });
+
+                test('luen.ajaxPost type rawXml assertSame', function() {
+                    luen.ajaxPost(
+                        'file/xml.xml',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'rawXml'
+                    );
+                    jQuery.post(
+                        'file/xml.xml',
+                        function(data, xhr) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                });
+
+                test('luen.ajaxPost type xml assertSame', function() {
+                    luen.ajaxPost(
+                        'file/xml.xml',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                    jQuery.post(
+                        'file/xml.xml',
+                        function(data, xhr) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                });
+
+                test('luen.ajaxPost type html assertSame', function() {
+                    luen.ajaxPost(
+                        window.location + '',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('test_div').nodeName, 'DIV');
+                        },
+                        'html'
+                    );
+                    jQuery.post(
+                        window.location + '',
+                        function(data, xhr) {
+                            assertType(data, 'string');
+                        },
+                        'html'
+                    );
+                });
+
+                test('luen.ajaxPost type json assertSame', function() {
+                    luen.ajaxPost(
+                        'file/json.json',
+                        function(data, xhr, opt) {
+                            assertSame(data.c, 'żółć');
+                        },
+                        'json'
+                    );
+                    jQuery.post(
+                        'file/json.json',
+                        function(data, xhr) {
+                            assertSame(data.c, 'żółć');
+                        },
+                        'json'
+                    );
+                });
+
+                test('luen.ajaxPost type script assertSame', function() {
+                    luen.ajaxPost(
+                        'file/js.js',
+                        { "a": 1, "b": 2, "c": "żółć" },
+                        function(data, xhr, opt) {
+                            assertSame(document.getElementById('test_div').getAttribute('data-test1-ajax'), 'abc');
+                        },
+                        'script'
+                    );
+                    jQuery.post(
+                        'file/js.js',
+                        { "a": 1, "b": 2, "c": "żółć" },
+                        function(data, xhr) {
+                            assertSame(document.getElementById('test_div').getAttribute('data-test2-ajax'), 'abc');
+                        },
+                        'script'
+                    );
+                });
+
+                // luen.ajaxGet
+                test('luen.ajaxGet type xml assertType', function() {
+                    assertType(luen.ajaxGet('file/xml.xml', 'rawXml'), XMLHttpRequest);
+                });
+
+                test('luen.ajaxGet type rawXml assertSame', function() {
+                    luen.ajaxGet(
+                        'file/xml.xml',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'rawXml'
+                    );
+                    jQuery.get(
+                        'file/xml.xml',
+                        function(data, xhr) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                });
+
+                test('luen.ajaxGet type xml assertSame', function() {
+                    luen.ajaxGet(
+                        'file/xml.xml',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                    jQuery.get(
+                        'file/xml.xml',
+                        function(data, xhr) {
+                            assertSame(data.getElementById('root').nodeName, 'foo');
+                        },
+                        'xml'
+                    );
+                });
+
+                test('luen.ajaxGet type html assertSame', function() {
+                    luen.ajaxGet(
+                        window.location + '',
+                        function(data, xhr, opt) {
+                            assertSame(data.getElementById('test_div').nodeName, 'DIV');
+                        },
+                        'html'
+                    );
+                    jQuery.get(
+                        window.location + '',
+                        function(data, xhr) {
+                            assertType(data, 'string');
+                        },
+                        'html'
+                    );
+                });
+
+                test('luen.ajaxGet type json assertSame', function() {
+                    luen.ajaxGet(
+                        'file/json.json',
+                        function(data, xhr, opt) {
+                            assertSame(data.c, 'żółć');
+                        },
+                        'json'
+                    );
+                    jQuery.get(
+                        'file/json.json',
+                        function(data, xhr) {
+                            assertSame(data.c, 'żółć');
+                        },
+                        'json'
+                    );
+                });
+
+                test('luen.ajaxGet type script assertSame', function() {
+                    luen.ajaxGet(
+                        'file/js.js',
+                        { "a": 1, "b": 2, "c": "żółć" },
+                        function(data, xhr, opt) {
+                            assertSame(document.getElementById('test_div').getAttribute('data-test3-ajax'), 'abc');
+                        },
+                        'script'
+                    );
+                    jQuery.get(
+                        'file/js.js',
+                        { "a": 1, "b": 2, "c": "żółć" },
+                        function(data, xhr) {
+                            assertSame(document.getElementById('test_div').getAttribute('data-test4-ajax'), 'abc');
+                        },
+                        'script'
+                    );
+                });
+            //}
+
+            // helper for storages
+            function removeStorage(key) {
+                window.localStorage.removeItem(key);
+                window.sessionStorage.removeItem(key);
+            }
+
+            // luen.hasStorage
+            test('luen.hasStorage name assertSame', function() {
+                var arg = 'somename';
+                removeStorage(arg);
+                assertSame(luen.hasStorage(arg), false);
+            });
+
+            // luen.setStorage
+            test('luen.setStorage expires never assertSame', function() {
+                var arg = 'item_expires_never';
+                removeStorage(arg);
+                assertType(luen.setStorage(arg, 'abc', 'never'), 'function');
+            });
+
+            test('luen.setStorage expires number assertSame', function() {
+                var arg = 'item_expires_number';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, '', 3600).hasStorage(arg), true);
+            });
+
+            test('luen.setStorage expires session assertSame', function() {
+                var arg = 'item_expires_session';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, 'abc', 'session').hasStorage(arg), true);
+            });
+
+            test('luen.setStorage expires undefined assertSame', function() {
+                var arg = 'item_expires_undefined';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, 'abc').hasStorage(arg), true);
+            });
+
+            // luen.getStorage
+            test('luen.getStorage expires never assertSame', function() {
+                var arg = 'item_expires_never';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, '123', 'never').getStorage(arg), '123');
+            });
+
+            test('luen.getStorage expires session assertSame', function() {
+                var arg = 'item_expires_session';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, '{}', 'session').getStorage(arg), '{}');
+            });
+
+            // luen.removeStorage
+            test('luen.getStorage expires never assertSame', function() {
+                var arg = 'item_expires_never';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, '123', 'never').removeStorage(arg).getStorage(arg), undefined);
+            });
+
+            test('luen.getStorage expires session assertSame', function() {
+                var arg = 'item_expires_session';
+                removeStorage(arg);
+                assertSame(luen.setStorage(arg, '[]', 'session').removeStorage(arg).hasStorage(arg), false);
+            });
+
+            // helper for cookies
+            function removeCookie(key, path, domain) {
+                document.cookie = encodeURIComponent(key) + '=' +
+                    ((path) ? '; path=' + path : '') +
+                    ((domain) ? '; domain=' + domain : '') +
+                    '; expires=Thu, 01-Jan-70 00:00:01 GMT';
+            }
+
+            // luen.hasCookie
+            test('luen.hasCookie assertSame', function() {
+                var arg = 'xyz';
+                removeCookie(arg);
+                assertSame(luen.hasCookie(arg), false);
+            });
+
+            // luen.setCookie
+            test('luen.setCookie assertType', function() {
+                var arg = 'somename1';
+                removeCookie(arg, '/');
+                assertType(luen.setCookie(arg, arg, 3600, '/'), 'function');
+            });
+
+            test('luen.setCookie assertSame', function() {
+                var arg = 'somename2';
+                removeCookie(arg, '/');
+                assertSame(luen.setCookie(arg, arg, '3600', '/').hasCookie(arg), true);
+            });
+
+            test('luen.setCookie path assertSame', function() {
+                var arg = 'somename3';
+                removeCookie(arg, '/_aaa');
+                assertSame(luen.setCookie(arg, arg, '', '/_aaa').hasCookie(arg), false);
+            });
+
+            test('luen.setCookie path domain assertSame', function() {
+                var arg = 'somename4';
+                removeCookie(arg, '/_bbb', 'example.com');
+                assertSame(luen.setCookie(arg, arg, '', '/_bbb', 'example.com').hasCookie(arg), false);
+            });
+
+            // luen.getCookie
+            test('luen.getCookie undefined assertSame', function() {
+                var arg = 'abc';
+                removeCookie(arg);
+                assertSame(luen.setCookie(arg, arg).getCookie('xyz'), undefined);
+            });
+
+            test('luen.getCookie first local overwrite global assertSame', function() {
+                var arg = 'first';
+                removeCookie(arg);
+                assertSame(luen.setCookie(arg, 'a').setCookie(arg, 'b', '', '/').getCookie(arg), 'a');
+            });
+
+            test('luen.getCookie second local overwrite global assertSame', function() {
+                var arg = 'second';
+                removeCookie(arg);
+                assertSame(luen.setCookie(arg, 'a', '', '/').setCookie(arg, 'b').getCookie(arg), 'b');
+            });
+
+            test('luen.getCookie special characters assertSame', function() {
+                var arg = '  \t żółć \n ';
+                removeCookie(arg);
+                assertSame(luen.setCookie(arg, arg).getCookie(arg), arg);
+            });
+
+            // luen.removeCookie
+            test('luen.removeCookie assertType', function() {
+                var arg = '123';
+                removeCookie(arg);
+                assertType(luen.setCookie(arg, arg).removeCookie(arg), 'function');
+            });
+
+            test('luen.removeCookie local assertSame', function() {
+                var arg = 'abc żółć xyz1';
+                removeCookie(arg);
+                assertSame(luen.setCookie(arg, arg).removeCookie(arg).hasCookie(arg), false);
+            });
+
+            test('luen.removeCookie global without path assertSame', function() {
+                var arg = 'abc żółć xyz2';
+                removeCookie(arg, '/');
+                assertSame(luen.setCookie(arg, arg, '', '/').removeCookie(arg).hasCookie(arg), true);
+            });
+
+            test('luen.removeCookie global with path assertSame', function() {
+                var arg = 'abc żółć xyz3';
+                removeCookie(arg, '/');
+                assertSame(luen.setCookie(arg, arg, '', '/').removeCookie(arg, '/').hasCookie(arg), false);
+            });
+
+            test('luen.removeCookie global with path and domain assertSame', function() {
+                var arg = 'abc żółć xyz4';
+                removeCookie(arg, '/', 'example.com');
+                assertSame(luen.setCookie(arg, arg, '', '/', 'example.com').removeCookie(arg, '/', 'example.com').hasCookie(arg), false);
+            });
+
+            test('luen.removeCookie global without domain and with path assertSame', function() {
+                var arg = 'abc żółć xyz5';
+                removeCookie(arg, '/', 'example.com');
+                assertSame(luen.setCookie(arg, arg, '', '/', 'example.com').removeCookie(arg, '/').hasCookie(arg), false);
+            });
+
+            // luen.assertType
+            test('luen.assertType string assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen.assertType(arg, 'string'), arg);
+            });
+
+// dynamic methods
+            // constructor
+            test('constructor empty assertSame', function() {
+                assertSame(luen().length, 0);
+                assertSame(jQuery().length, 0);
+            });
+
+            test('constructor empty string assertSame', function() {
+                var arg = '';
+                assertSame(luen(arg).length, 0);
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor white space assertException', function() {
+                var arg = ' ';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor tab string assertException', function() {
+                var arg = "\t";
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor tab new line tab string assertException', function() {
+                var arg = "\t\n\t";
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor number string assertException', function() {
+                var arg = '0';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor number assertSame', function() {
+                var arg = 0;
+                assertSame(luen(arg).length, 0);
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor getElementById assertSame', function() {
+                var arg = document.getElementById('test_div');
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor large number assertException', function() {
+                var arg = 1234567890;
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor object string assertException', function() {
+                var arg = new String('foo');
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 3);
+            });
+
+            test('constructor object XMLDocument assertSame', function() {
+                var arg = (new window.DOMParser()).parseFromString('<foo>bar</foo>', 'text/xml');
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor object XMLDocument namespace assertSame', function() {
+                var arg = (new window.DOMParser()).parseFromString('<x:foo xmlns:x="http://example.com">bar</x:foo>', 'text/xml');
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><bar>baz</bar></foo>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 2);
+            });
+
+            test('constructor html doctype assertSame', function() {
+                var arg = '<!docType html><html><p>foo</p></html>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor html assertSame', function() {
+                var arg = '<htm></html>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor html script assertSame', function() {
+                var arg = '<html><script>alert("Hello world!");<\/script><html>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor tag assertSame', function() {
+                var arg = '<foo>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor xml whitespaces assertSame', function() {
+                var arg = "<foo><bar>\n<baz></baz>\n</bar></foo>";
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor xml special characters assertSame', function() {
+                var arg = '<foo>żółć</foo>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor glob string assertSame', function() {
+                var arg = '*';
+                assertSame(luen(arg).length > 0, true);
+                assertSame(jQuery(arg).length > 0, true);
+            });
+
+            test('constructor document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor null assertSame', function() {
+                var arg = null;
+                assertSame(luen(arg).length, 0);
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor true assertException', function() {
+                var arg = true;
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor false assertSame', function() {
+                var arg = false;
+                assertSame(luen(arg).length, 0);
+                assertSame(jQuery(arg).length, 0);
+            });
+
+            test('constructor xml namespaces assertSame', function() {
+                var arg = '<x:foo xmlns:x="" x:id="baz">bar</x:foo>';
+                assertSame(luen(arg).length, 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor json string assertException', function() {
+                var arg = '{"foo":"bar"}';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertException('Error', function() {
+                    jQuery(arg);
+                });
+            });
+
+            test('constructor empty json string assertException', function() {
+                var arg = '{}';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertException('Error', function() {
+                    jQuery(arg);
+                });
+            });
+
+            test('constructor json string whitespaces assertException', function() {
+                var arg = ' \t {\n"foo"\n: "bar"    } ';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertException('Error', function() {
+                    jQuery(arg);
+                });
+            });
+
+            test('constructor array string assertException', function() {
+                var arg = '["foo", "bar", "baz"]';
+                assertException('SyntaxError', function() {
+                    luen(arg);
+                });
+                assertException('Error', function() {
+                    jQuery(arg);
+                });
+            });
+
+            test('constructor json parse assertException', function() {
+                var arg = JSON.parse('{"foo":"bar"}');
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor json assertException', function() {
+                var arg = { "a": 1, "b": 2 };
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('constructor array assertException', function() {
+                var arg = [1, 2, 3];
+                assertException('TypeError', function() {
+                    luen(arg);
+                });
+                assertSame(jQuery(arg).length, 3);
+            });
+
+            // .find
+            test('.find query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).find(arg), Luen);
+                assertType(jQuery(arg).find(arg), jQuery);
+            });
+
+            test('.find x3 query assertSame', function() {
+                var arg = 'html';
+                assertSame(luen(arg).find('body').find('*').find('h1').getQuery(), 'html body * h1');
+                assertSame(jQuery(arg).find('body').find('*').find('h1').selector, 'html body * h1');
+            });
+
+            test('.find x2 query assertSame', function() {
+                var arg = 'html';
+                assertSame(luen(arg).find('body').find('h1').length, 1);
+                assertSame(jQuery(arg).find('body').find('h1').length, 1);
+            });
+
+            // .extend
+            test('.extend object assertSame', function() {
+                var obj = {
+                    func: function() {
+                        return 123;
+                    }
+                };
+                assertSame(luen('body').extend(obj).func(), 123);
+            });
+
+            // .ready
+            test('.ready document assertType', function() {
+                assertType(luen(document).ready(function() {}), Luen);
+                assertType(jQuery(document).ready(function() {}), jQuery);
+            });
+
+            test('.ready query assertType', function() {
+                assertType(luen('[id]').ready(function() {}), Luen);
+                assertType(jQuery('[id]').ready(function() {}), jQuery);
+            });
+
+            // .on
+            test('.on query assertType', function() {
+                assertType(luen('#test_div').on('DOMContentLoaded', function() {}), Luen);
+                assertType(jQuery('#test_div').on('DOMContentLoaded', function() {}), jQuery);
+            });
+
+            // .off
+            test('.off query assertType', function() {
+                assertType(luen('#test_div').off('click', function() {}), Luen);
+                assertType(jQuery('#test_div').off('click', function() {}), jQuery);
+            });
+
+            // .each
+            test('.each query assertSame', function() {
+                var arg = '#test_div';
+                var elem = luen(arg).each(function(index, value) {
+                    luen(value).setAttribute('data-test-each', 'luen');
+                });
+                assertSame(elem.getAttribute('data-test-each'), 'luen');
+                var elem = jQuery(arg).each(function(index, value) {
+                    jQuery(value).attr('data-test-each', 'jQuery');
+                });
+                assertSame(elem.attr('data-test-each'), 'jQuery');
+            });
+
+            test('.each query this assertSame', function() {
+                var arg = '#test_div';
+                var elem = luen(arg).each(function() {
+                    luen(this).setAttribute('data-test-each', 'l');
+                });
+                assertSame(elem.getAttribute('data-test-each'), 'l');
+                var elem = jQuery(arg).each(function() {
+                    jQuery(this).attr('data-test-each', 'j');
+                });
+                assertSame(elem.attr('data-test-each'), 'j');
+            });
+
+            // .getQuery
+            test('.getQuery query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getQuery(), arg);
+                assertSame(jQuery(arg).selector, arg);
+            });
+
+            test('.getQuery object assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).getQuery(), '');
+                assertSame(jQuery(arg).selector, '');
+            });
+
+            // .getContext
+            test('.getContext query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getContext(), document);
+                assertSame(jQuery(arg).context, document);
+            });
+
+            test('.getContext null assertSame', function() {
+                var arg = null;
+                assertSame(luen(arg).getContext(), undefined);
+            });
+
+            test('.getContext xml object assertSame', function() {
+                var arg = (new window.DOMParser()).parseFromString('<foo>bar</foo>', 'text/xml');
+                assertSame(luen(arg).getContext(), arg);
+                assertSame(jQuery(arg).context, arg);
+            });
+
+            // .getLength
+            test('.getLength query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getLength(), 1);
+                assertSame(jQuery(arg).length, 1);
+            });
+
+            test('.getLength xml assertSame', function() {
+                var arg = '<foo id="a">dd</foo><bar id="b"></bar><bar></bar>';
+                assertSame(luen(arg).getLength(), 3);
+                assertSame(jQuery(arg).length, 3);
+            });
+
+            // .getName
+            test('.getName query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getName(), 'DIV');
+            });
+
+            test('.getName xml assertSame', function() {
+                var arg = '   <foo id="a">dd</foo><bar id="b"></bar><bar></bar>   ';
+                assertSame(luen(arg).find('#a').getName(), 'FOO');
+            });
+
+            test('.getName object document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).getName(), '#document');
+            });
+
+            // .is
+            test('.is html input checked assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox checked>';
+                assertSame(luen(arg).is(':checked'), true);
+                assertSame(jQuery(arg).is(':checked'), true);
+            });
+
+            test('.is html input disabled assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox checked disabled>';
+                assertSame(luen(arg).is(':disabled'), true);
+                assertSame(jQuery(arg).is(':disabled'), true);
+            });
+
+            test('.is query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).is(':disabled'), false);
+                assertSame(jQuery(arg).is(':disabled'), false);
+            });
+
+            // .hasProperty
+            test('.hasProperty html input assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox>';
+                assertSame(luen(arg).hasProperty('someproperty'), false);
+            });
+
+            test('.hasProperty html input checked assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox checked disabled>';
+                assertSame(luen(arg).hasProperty('checked'), true);
+            });
+
+            test('.hasProperty html input value assertSame', function() {
+                var arg = '<input type=text name=someinput value=abc>';
+                assertSame(luen(arg).hasProperty('value'), true);
+            });
+
+            test('.hasProperty html input required assertSame', function() {
+                var arg = '<input type=text name=someinput required="required">';
+                assertSame(luen(arg).hasProperty('required'), true);
+            });
+
+            test('.hasProperty query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasProperty('checked'), false);
+            });
+
+            test('.hasProperty null assertSame', function() {
+                var arg = null;
+                assertSame(luen(arg).hasProperty('checked'), false);
+            });
+
+            // .setProperty
+            test('.setProperty query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).setProperty('checked', true), Luen);
+            });
+
+            test('.setProperty query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setProperty('checked', true).hasProperty('checked'), true);
+            });
+
+            test('.setProperty html input assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox>';
+                assertSame(luen(arg).setProperty('checked', true).hasProperty('checked'), true);
+            });
+
+            test('.setProperty xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').setProperty('class', 'cl').hasProperty('class'), true);
+            });
+
+            test('.setProperty object document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).setProperty('class', 'cl').hasProperty('class'), true);
+            });
+
+            // .getProperty
+            test('.getProperty html assertSame', function() {
+                var arg = '<input type=checkbox name=somecheckbox>';
+                assertSame(luen(arg).getProperty('checked'), false);
+            });
+
+            test('.getProperty query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getProperty('value'), undefined);
+            });
+
+            test('.getProperty object document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).setProperty('class', 'cl').getProperty('class'), 'cl');
+            });
+
+            // .removeProperty
+            test('.removeProperty query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setProperty('paddingLeft', '123px').removeProperty('paddingLeft').hasProperty('paddingLeft'), false);
+            });
+
+            test('.removeProperty query style assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).removeProperty('style').hasProperty('style'), true);
+            });
+
+            test('.removeProperty xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').setProperty('paddingLeft', '123px').removeProperty('paddingLeft').hasProperty('paddingLeft'), false);
+            });
+
+            // .hasPropertyStyle
+            test('.hasPropertyStyle query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).hasPropertyStyle('display'), 'boolean');
+            });
+
+            test('.hasPropertyStyle query assertSame', function() {
+                var arg = '#test_div';
+                document.querySelectorAll('#test_div')[0].style.borderLeft = '1px solid red';
+                assertSame(luen(arg).hasPropertyStyle('borderLeft'), true);
+            });
+
+            test('.hasPropertyStyle html assertSame', function() {
+                var arg = '<html><p style="margin: 1px">abc</p></html>';
+                assertSame(luen(arg).find('p').hasPropertyStyle('color'), false);
+            });
+
+            test('.hasPropertyStyle xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo style="font-size: 1px;"></foo>';
+                assertSame(luen(arg).find('foo').hasPropertyStyle('fontSize'), true);
+            });
+
+            // .setPropertyStyle
+            test('.setPropertyStyle query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).setPropertyStyle('display', 'none'), Luen);
+            });
+
+            test('.setPropertyStyle query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setPropertyStyle('border-top', 'solid 1px red').hasPropertyStyle('border-top'), true);
+            });
+
+            test('.setPropertyStyle query object assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setPropertyStyle({'pading-bottom': '5px', 'somestyle': '123'}).hasPropertyStyle('pading-bottom'), true);
+            });
+
+            test('.setPropertyStyle xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').setPropertyStyle('right', '12px').hasPropertyStyle('right'), true);
+            });
+
+            // .getPropertyStyle
+            test('.getPropertyStyle query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).getPropertyStyle('display'), 'string');
+            });
+
+            test('.getPropertyStyle query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getPropertyStyle('displayyy'), undefined);
+            });
+
+            test('.getPropertyStyle xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo style="color: purple;"></foo>';
+                assertSame(luen(arg).find('foo').getPropertyStyle('color'), 'purple');
+            });
+
+            // .hasComputedStyle
+            test('.hasComputedStyle query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasComputedStyle('left'), true);
+            });
+
+            test('.hasComputedStyle xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').hasComputedStyle('color'), false);
+            });
+
+            // .getComputedStyle
+            test('.getComputedStyle query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getComputedStyle('left'), '1px');
+                assertSame(jQuery(arg).css('left'), '1px');
+            });
+
+            test('.getComputedStyle query undefined assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getComputedStyle('lefttt'), undefined);
+                assertSame(jQuery(arg).css('lefttt'), undefined);
+            });
+
+            test('.getComputedStyle query number assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getComputedStyle('opacity'), '1');
+                assertSame(jQuery(arg).css('opacity'), '1');
+            });
+
+            test('.getComputedStyle html assertSame', function() {
+                var arg = '<!doctype html><html><head><style>body { left: 2px; }</style></head><body style="left: 1px;"></body></html>';
+                assertSame(luen(arg).find('body').getComputedStyle('left'), undefined);
+                assertSame(jQuery('body', arg).css('left'), undefined);
+            });
+
+            // .hasCss
+            test('.hasCss query left assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).hasCss('left'), 'boolean');
+                assertType(jQuery(arg).css('left'), 'string');
+            });
+
+            test('.hasCss query left assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasCss('left'), true);
+                assertSame(jQuery(arg).css('left'), '1px');
+            });
+
+            test('.hasCss query right assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasCss('right'), true);
+                assertSame(jQuery(arg).css('right'), 'auto');
+            });
+
+            test('.hasCss query separator assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasCss('padding-right'), true);
+                assertSame(jQuery(arg).css('padding-right'), '0px');
+            });
+
+            test('.hasCss html assertSame', function() {
+                var arg = '<!doctype html><html><head><style>body { left: 2px; }</style></head><body style="left: 1px;"></body></html>';
+                assertSame(luen(arg).find('body').hasCss('left'), true);
+                assertSame(jQuery('body', arg).css('left'), undefined);
+            });
+
+            // .setCss
+            test('.setCss query bottom assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).setCss('bottom', '1px'), Luen);
+                assertType(jQuery(arg).css('bottom', '1px'), jQuery);
+            });
+
+            test('.setCss query bottom assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setCss('bottom', '123px').hasCss('bottom'), true);
+                assertSame(jQuery(arg).css('bottom', '321px').css('bottom'), '321px');
+            });
+
+            test('.setCss query object assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setCss({bottom: '123px', "top": '2px'}).getPropertyStyle('top'), '2px');
+                assertSame(jQuery(arg).css({bottom: '321px', "top": '4px'}).css('top'), '4px');
+            });
+
+            test('.setCss html assertSame', function() {
+                var arg = '<!doctype html><html><head><style>body { left: 2px; }</style></head><body style="left: 1px;"></body></html>';
+                assertSame(luen(arg).find('body').setCss('border-left', '1em').hasCss('border-left'), true);
+                assertSame(jQuery('body', arg).css('border-left', '2em').css('border-left'), undefined);
+            });
+
+            // .getCss
+            test('.getCss query left assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getCss('left'), '1px');
+                assertSame(jQuery(arg).css('left'), '1px');
+            });
+
+            test('.getCss html assertSame', function() {
+                var arg = '<!doctype html><html><head><style>body { border-left: 2px; }</style></head><body style="border-left: 1px;"></body></html>';
+                assertSame(luen(arg).find('body').setCss('border-left', 'solid 1em red').getCss('border-left'), '1em solid red');
+                assertSame(jQuery('body', arg).css('border-left', '2em').css('border-left'), undefined);
+            });
+
+            // .hasAttribute
+            test('.hasAttribute query assertSame', function() {
+                var arg = 'body';
+                assertSame(luen(arg).hasAttribute('id'), false);
+                assertSame(jQuery(arg).attr('id'), undefined);
+            });
+
+            test('.hasAttribute html assertSame', function() {
+                var arg = '<b><b><input type=checkbox name=somecheckbox>';
+                assertSame(luen(arg).find('input').hasAttribute('name'), true);
+                assertSame(jQuery(arg).find('input').attr('name'), 'somecheckbox');
+            });
+
+            test('.hasAttribute xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><bar>baz</bar></foo>';
+                assertSame(luen(arg).find('bar').hasAttribute('id'), false);
+                assertSame(jQuery('bar', arg).attr('id'), undefined);
+            });
+
+            test('.hasAttribute xml namespaces assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo xmlns:x="http://example.com"><x:bar x:id="">baz</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').hasAttribute('x:id'), true);
+                assertSame(jQuery('x:bar', arg).attr('id'), undefined);
+            });
+
+            test('.hasAttribute xml namespaces document.write assertSame', function() {
+                var arg = 'x:p';
+                document.write('<x:p x:id=""></x:p>');
+                assertSame(luen('x:p').hasAttribute('x:id'), true);
+                assertSame(jQuery('x\\:p').attr('x:id'), '');
+            });
+
+            test('.hasAttribute xml tags assertSame', function() {
+                var arg = '<foo>dd</foo><bar id="b"></bar><bar></bar>';
+                assertSame(luen(arg).find('bar').hasAttribute('id'), true);
+                assertSame(jQuery('bar', arg).attr('id'), undefined);
+            });
+
+            // .setAttribute
+            test('.setAttribute xml tags assertType', function() {
+                var arg = '<foo>dd</foo><bar></bar><bar></bar>';
+                assertType(luen(arg).find('foo + bar').setAttribute('id', 'test'), Luen);
+                assertType(jQuery(arg).find('foo + bar').attr('id', 'test'), jQuery);
+            });
+
+            test('.setAttribute query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).setAttribute('data-setattr', 'test').hasAttribute('data-setattr'), true);
+                assertSame(jQuery(arg).attr('data-setattr', 'test').attr('data-setattr'), 'test');
+            });
+
+            test('.setAttribute xml assertSame', function() {
+                var arg = '<bar></bar>';
+                assertSame(luen(arg).find('bar').setAttribute('id', 'test').find('bar').hasAttribute('id'), true);
+            });
+
+            // .getAttribute
+            test('.getAttribute xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">baz</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').getAttribute('x:id'), '');
+                assertSame(jQuery('x\\:bar', arg).attr('x:id'), '');
+            });
+
+            test('.getAttribute query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).getAttribute('data-attr'), undefined);
+                assertSame(jQuery(arg).attr('data-attr'), undefined);
+            });
+
+            test('.getAttribute somequery assertSame', function() {
+                var arg = 'somequery';
+                assertSame(luen(arg).getAttribute('data-attr'), undefined);
+                assertSame(jQuery(arg).attr('data-attr'), undefined);
+            });
+
+            test('.getAttribute document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).find('#test_div').getAttribute('id'), 'test_div');
+                assertSame(jQuery(arg).find('#test_div').attr('id'), 'test_div');
+            });
+
+            test('.getAttribute getElementById assertSame', function() {
+                var arg = document.getElementById('test_div');
+                assertSame(luen(arg).getAttribute('id'), 'test_div');
+                assertSame(jQuery(arg).attr('id'), 'test_div');
+            });
+
+            test('.getAttribute querySelectorAll assertSame', function() {
+                var arg = document.querySelectorAll('div[id=test_div]');
+                assertSame(luen(arg).getAttribute('id'), 'test_div');
+                assertSame(jQuery(arg).attr('id'), 'test_div');
+            });
+
+            test('.getAttribute querySelectorAll[0] assertSame', function() {
+                var arg = document.querySelectorAll('div[id=test_div]')[0];
+                assertSame(luen(arg).getAttribute('id'), 'test_div');
+                assertSame(jQuery(arg).attr('id'), 'test_div');
+            });
+
+            test('.getAttribute XMLDocument assertSame', function() {
+                var arg = luen.parseXml('<?xml version="1.0"?><foo><x:bar x:id="" xmlns:x="http://example.com">baz</x:bar></foo>');
+                assertSame(luen(arg).find('x:bar').getAttribute('x:id'), undefined);
+                assertSame(jQuery('x:bar', arg).attr('x:id'), undefined);
+            });
+
+            test('.getAttribute HTMLDocument assertSame', function() {
+                var arg = luen.parseHtml('<?xml version="1.0"?><foo><x:bar x:id="" xmlns:x="http://example.com">baz</x:bar></foo>');
+                assertSame(luen(arg).find('x:bar').getAttribute('x:id'), '');
+                assertSame(jQuery('x:bar', arg).attr('x:id'), undefined);
+            });
+
+            // .removeAttribute
+            test('.removeAttribute xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">baz</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').removeAttribute('x:id').hasAttribute('x:id'), false);
+                assertSame(jQuery('x:bar', arg).removeAttr('x:id').attr('x:id'), undefined);
+            });
+
+            test('.removeAttribute query assertSame', function() {
+                var arg = 'body';
+                assertSame(luen(arg).setAttribute('data-remove', 'yes').removeAttribute('data-remove').hasAttribute('data-remove'), false);
+                assertSame(jQuery(arg).attr('data-remove', 'yes').removeAttr('data-remove').attr('data-remove'), undefined);
+            });
+
+            // .hasClass
+            test('.hasClass query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).hasClass('abc'), 'boolean');
+                assertType(jQuery(arg).hasClass('abc'), 'boolean');
+            });
+
+            test('.hasClass query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hasClass(''), true);
+                assertSame(jQuery(arg).hasClass(''), true);
+            });
+
+            test('.hasClass xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><bar class="abc xyz">baz</bar></foo>';
+                assertSame(luen(arg).find('bar').hasClass('abc'), true);
+                assertSame(jQuery('bar', arg).hasClass('abc'), true);
+            });
+
+            test('.hasClass tags namespaces document.write assertSame', function() {
+                var arg = 'x:x';
+                document.write('<x:x class="żółć l ćłóż"></x:x>');
+                assertSame(luen('x:x').hasClass('l'), true);
+                assertSame(jQuery('x\\:x').hasClass('l'), true);
+            });
+
+            // .addClass
+            test('.addClass xml tags assertType', function() {
+                var arg = '<foo>dd</foo><bar></bar><bar></bar>';
+                assertType(luen(arg).find('foo + bar').addClass('test1'), Luen);
+                assertType(jQuery(arg).find('foo + bar').addClass('test2'), jQuery);
+            });
+
+            test('.addClass xml tags special characters assertSame', function() {
+                var arg = '<foo>dd</foo><bar></bar><bar></bar>';
+                assertSame(luen(arg).find('foo + bar').addClass('ż').hasClass('ż'), true);
+                assertSame(jQuery(arg).find('foo + bar').addClass('ć').hasClass('ć'), false);
+            });
+
+            // .removeClass
+            test('.removeClass xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar class=" foo \tbar  baz\t  ">baz</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').removeClass('baz').hasClass('baz'), false);
+                assertSame(jQuery('x:bar', arg).removeClass('baz').hasClass('baz'), false);
+            });
+
+            // .removeClass
+            test('.removeClass assertSame', function() {
+                var arg = 'body';
+                document.body.setAttribute('class', 'cbazyx');
+                assertSame(luen(arg).addClass('cba').removeClass('cba').hasClass('cba'), false);
+                assertSame(jQuery(arg).addClass('zyx').removeClass('zyx').hasClass('zyx'), false);
+                document.body.removeAttribute('class');
+            });
+
+            // .getOffset
+            test('.getOffset query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).getOffset(), 'object');
+                assertType(jQuery(arg).offset(), 'object');
+            });
+
+            test('.getOffset query assertSame', function() {
+                var arg = 'html';
+                assertSame(luen(arg).getOffset().top, 0);
+                assertSame(luen(arg).getOffset().left, 0);
+                assertSame(luen(arg).getOffset().width > 0, true);
+                assertSame(luen(arg).getOffset().height > 0, true);
+                assertSame(jQuery(arg).offset().top, 0);
+                assertSame(jQuery(arg).offset().left, 0);
+            });
+
+            test('.getOffset html assertSame', function() {
+                var arg = '<!doctype html><html style="top: 5px;"></html>';
+                assertSame(luen(arg).find('html').getOffset().top, 0);
+            });
+
+            test('.getOffset xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo style="top: 5px;"></foo>';
+                assertSame(luen(arg).find('foo').getOffset().top, 0);
+            });
+
+            // .insertBefore
+            test('.insertBefore xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo id="ins_bef"></foo>';
+                assertSame(luen(arg).insertBefore('#test_div').getPrev().getAttribute('id'), 'ins_bef');
+            });
+
+            // .insertAfter
+            test('.insertAfter xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo id="ins_af"></foo>';
+                assertSame(luen(arg).insertAfter('#test_div').find('+ #ins_af').getAttribute('id'), 'ins_af');
+            });
+
+            // .prependTo
+            test('.prependTo xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo id="prep_to"></foo>';
+                assertSame(luen(arg).prependTo('#test_div').find('#prep_to').getAttribute('id'), 'prep_to');
+            });
+
+            // .appendTo
+            test('.appendTo xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo id="prep_to"></foo>';
+                assertSame(luen(arg).appendTo('#test_div').find('> foo').getAttribute('id'), 'prep_to');
+            });
+
+            test('.appendTo html create assertSame', function() {
+                var arg = '<someTag>';
+                assertSame(luen(arg).setAttribute('id', 'some_tag').appendTo('#test_div').find('> someTag').getAttribute('id'), 'some_tag');
+            });
+
+            // .insertHtml
+            test('.insertHtml query tag afterbegin assertSame', function() {
+                var arg = 'div#test_div';
+                assertSame(luen(arg).insertHtml('afterbegin', '<div id="insertDiv"></div>').find('#insertDiv').getAttribute('id'), 'insertDiv');
+            });
+
+            test('.insertHtml query afterbegin assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).insertHtml('afterbegin', '<div id="insertDiv"></div>').find('#insertDiv').getAttribute('id'), 'insertDiv');
+            });
+
+            test('.insertHtml html afterbegin assertSame', function() {
+                var arg = '<!doctype html><html></html>';
+                assertSame(luen(arg).find('html').insertHtml('afterbegin', '<div id="insertDiv"></div>').find('#insertDiv').getAttribute('id'), 'insertDiv');
+            });
+
+            // .setHtml
+            test('.setHtml query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).setHtml('abc'), Luen);
+                assertType(jQuery(arg).html('abc'), jQuery);
+            });
+
+            test('.setHtml xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">baz</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').setHtml('żółć')[0].innerHTML, 'żółć');
+                assertSame(jQuery('x\\:bar', arg).html('żółć').html(), 'żółć');
+            });
+
+            // .addHtml
+            test('.addHtml query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).addHtml('abc'), Luen);
+                assertType(jQuery(arg).append('abc'), jQuery);
+            });
+
+            test('.addHtml xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">abc</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').addHtml('żółć')[0].innerHTML, 'abcżółć');
+                assertSame(jQuery('x\\:bar', arg).html('żółć').html(), 'żółć');
+            });
+
+            // .getHtml
+            test('.getHtml query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getHtml(), 'string');
+                assertType(jQuery(arg).html(), 'string');
+            });
+
+            test('.getHtml xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').getHtml(), 'żółć');
+                assertSame(jQuery('x\\:bar', arg).html(), 'żółć');
+            });
+
+
+            // .getHtml
+            test('.getHtml query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getHtml(), 'string');
+                assertType(jQuery(arg).html(), 'string');
+            });
+
+            test('.getHtml xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').getHtml(), 'żółć');
+                assertSame(jQuery('x\\:bar', arg).html(), 'żółć');
+            });
+
+            // .getParent
+            test('.getParent query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getParent(), Luen);
+                assertType(jQuery(arg).parent(), jQuery);
+            });
+
+            test('.getParent query assertSame', function() {
+                var arg = 'body';
+                assertSame(luen(arg).getParent().getName().toLowerCase(), 'html');
+                assertSame(jQuery(arg).parent()[0].nodeName.toLowerCase(), 'html');
+            });
+
+            test('.getParent x2 query assertSame', function() {
+                var arg = 'h1';
+                assertSame(luen(arg).getParent().getParent().getQuery(), '');
+                assertSame(jQuery(arg).parent().parent().selector, '');
+            });
+
+            test('.getParent xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').getParent().getName().toLowerCase(), 'foo');
+            });
+
+            // .getChildren
+            test('.getChildren query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getChildren(), Luen);
+                assertType(jQuery(arg).children(), jQuery);
+            });
+
+            test('.getChildren query assertSame', function() {
+                var arg = 'html';
+                assertSame(luen(arg).getChildren().getName().toLowerCase(), 'head');
+                assertSame(jQuery(arg).children()[0].nodeName.toLowerCase(), 'head');
+            });
+
+            test('.getChildren x2 query assertSame', function() {
+                var arg = 'html';
+                assertSame(luen(arg).getChildren().getChildren().getQuery(), '');
+                assertSame(jQuery(arg).children().children().selector, '');
+            });
+
+            test('.getChildren xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('foo').getChildren().getName().toLowerCase(), 'x:bar');
+            });
+
+            // .getPrev
+            test('.getPrev query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getPrev(), Luen);
+                assertType(jQuery(arg).prev(), jQuery);
+            });
+
+            test('.getPrev query assertSame', function() {
+                var arg = 'body';
+                assertSame(luen(arg).getPrev().getName().toLowerCase(), 'head');
+                assertSame(jQuery(arg).prev()[0].nodeName.toLowerCase(), 'head');
+            });
+
+            test('.getPrev html assertSame', function() {
+                var arg = '<html></html>';
+                assertSame(luen(arg).find('html').getPrev().length, 0);
+            });
+
+            test('.getPrev xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:baz></x:baz><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('x:bar').getPrev().getName().toLowerCase(), 'x:baz');
+            });
+
+            test('.getPrev document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).getPrev().getName(), undefined);
+            });
+
+            test('.getPrev document assertSame', function() {
+                var arg = document;
+                assertSame(luen(arg).find('body').getPrev().getName(), 'HEAD');
+            });
+
+            // .getNext
+            test('.getNext query assertType', function() {
+                var arg = 'body';
+                assertType(luen(arg).getNext(), Luen);
+                assertType(jQuery(arg).next(), jQuery);
+            });
+
+            test('.getNext query assertSame', function() {
+                var arg = 'head';
+                assertSame(luen(arg).getNext().getName().toLowerCase(), 'body');
+                assertSame(jQuery(arg).next()[0].nodeName.toLowerCase(), 'body');
+            });
+
+            test('.getNext html assertSame', function() {
+                var arg = '<html></html>';
+                assertSame(luen(arg).find('html').getNext().length, 0);
+            });
+
+            test('.getNext xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><x:baz></x:baz><x:bar x:id="">żółć</x:bar></foo>';
+                assertSame(luen(arg).find('x:baz').getNext().getName().toLowerCase(), 'x:bar');
+            });
+
+            // .remove
+            test('.remove query assertType', function() {
+                var arg = 'sometag';
+                assertType(luen(arg).remove(), Luen);
+                assertType(jQuery(arg).remove(), jQuery);
+            });
+
+            test('.remove query write assertSame', function() {
+                var arg = '#remove_test';
+                document.write('<p id="remove_test"></p>');
+                assertSame(luen(arg).remove().length, 1);
+                document.write('<p id="remove_test"></p>');
+                assertSame(jQuery(arg).remove().length, 1);
+            });
+
+            test('.remove html assertSame', function() {
+                var arg = '<html><p>abc</p></html>';
+                assertSame(luen(arg).find('p').remove().getHtml(), undefined);
+                assertSame(jQuery('p', arg).remove().html(), undefined);
+            });
+
+            test('.remove xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo><baz>a</baz><bar id="b"></bar></foo>';
+                assertSame(luen(arg).find('bar').remove().find('bar').getAttribute('id'), undefined);
+            });
+
+            // .show
+            test('.show query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).show(), Luen);
+                assertType(jQuery(arg).show(), jQuery);
+            });
+
+            test('.show query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).show().getPropertyStyle('display'), undefined);
+                assertSame(jQuery(arg).show().css('display'), 'block');
+            });
+
+            test('.show query number assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).show(1000).getPropertyStyle('display'), undefined);
+                assertSame(jQuery(arg).show(1000).css('display'), 'block');
+            });
+
+            test('.show query string assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).show('fade').getPropertyStyle('display'), undefined);
+                assertSame(jQuery(arg).show('fade').css('display'), 'block');
+            });
+
+            test('.show query function assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).show(function() {}).getPropertyStyle('display'), undefined);
+                assertSame(jQuery(arg).show(function() {}).css('display'), 'block');
+            });
+
+            test('.show xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').show().getPropertyStyle('display'), undefined);
+            });
+
+            // .hide
+            test('.hide query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).hide(), Luen);
+                assertType(jQuery(arg).hide(), jQuery);
+            });
+
+            test('.hide query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hide().getPropertyStyle('display'), 'none');
+                assertSame(jQuery(arg).hide().css('display'), 'none');
+            });
+
+            test('.hide query number assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hide(1000).getPropertyStyle('display'), 'none');
+                assertSame(jQuery(arg).hide(1000).css('display'), 'none');
+            });
+
+            test('.hide query string assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hide('fade').getPropertyStyle('display'), 'none');
+                assertSame(jQuery(arg).hide('fade').css('display'), 'none');
+            });
+
+            test('.hide query function assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).hide(function() {}).getPropertyStyle('display'), 'none');
+                assertSame(jQuery(arg).hide(function() {}).css('display'), 'none');
+            });
+
+            test('.hide xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').hide().getPropertyStyle('display'), 'none');
+            });
+
+            // .toggle
+            test('.toggle query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).toggle(), Luen);
+                assertType(jQuery(arg).toggle(), jQuery);
+            });
+
+            test('.toggle query assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).toggle().getAttribute('data-luen-toggle'), 'hide');
+            });
+
+            test('.toggle query number assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).toggle(1000).getAttribute('data-luen-toggle'), 'show');
+            });
+
+            test('.toggle query string assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).toggle('fade').getAttribute('data-luen-toggle'), 'hide');
+            });
+
+            test('.toggle query function assertSame', function() {
+                var arg = '#test_div';
+                assertSame(luen(arg).toggle(function(elem) {
+                    elem.removeAttribute('data-luen-toggle');
+                }).getAttribute('data-luen-toggle'), undefined);
+            });
+
+            test('.toggle xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertSame(luen(arg).find('foo').toggle().getAttribute('data-luen-toggle'), 'hide');
+            });
+
+            // .serialize
+            test('.serialize query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).serialize(), 'string');
+                assertType(jQuery(arg).serialize(), 'string');
+            });
+
+            test('.serialize query tag assertSame', function() {
+                var arg = 'body';
+                assertSame(luen(arg).serialize(), 'single=a&multiple=a&multiple=c&check=b&radio=b&text=a&textarea=abc+%C5%BC%C3%B3%C5%82%C4%87&submit=a');
+                assertSame(jQuery(arg).serialize(), '');
+            });
+
+            test('.serialize query form assertSame', function() {
+                var arg = 'form#test_form';
+                assertSame(luen(arg).serialize(), 'single=a&multiple=a&multiple=c&check=b&radio=b&text=a&textarea=abc+%C5%BC%C3%B3%C5%82%C4%87&submit=a');
+                assertSame(jQuery(arg).serialize(), 'single=a&multiple=a&multiple=c&check=b&radio=b&text=a&textarea=abc+%C5%BC%C3%B3%C5%82%C4%87');
+            });
+
+            test('.serialize xml assertSame', function() {
+                var arg = '<?xml version="1.0"?><form><textarea name="txt">a</textarea></form>';
+                assertSame(luen(arg).find('form').serialize(), 'txt=a');
+                assertSame(jQuery(arg).find('form').serialize(), '');
+            });
+
+            // .ajaxLoad
+            test('.ajaxLoad query assertType', function() {
+                var arg = '#test_div';
+                assertType(luen(arg).ajaxLoad(window.location + '    html head +  body    h1 '), Luen);
+            });
+
+            test('.ajaxLoad xml assertType', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                assertType(luen(arg).find('foo').ajaxLoad(window.location + ' h1'), Luen);
+            });
+
+            test('.ajaxLoad xml prams string assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                luen(arg).find('foo').ajaxLoad(window.location + ' h1', 'a=1&b=2&c=żółć', function(data, xhr, opt) {
+                    assertSame(opt.params.c, 'żółć');
+                })
+            });
+
+            test('.ajaxLoad xml prams object assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                luen(arg).find('foo').ajaxLoad(window.location + ' h1', { "a": 1, "b": 2, "c": "żółć" }, function(data, xhr, opt) {
+                    assertSame(opt.params.c, 'żółć');
+                })
+            });
+
+            test('.ajaxLoad xml inner assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                luen(arg).find('foo').ajaxLoad(window.location + ' h1', 'a=1&b=2&c=żółć', function(data, xhr, opt) {
+                    assertSame(data, document.querySelector('h1').innerHTML);
+                })
+            });
+
+            test('.ajaxLoad xml prams assertSame', function() {
+                var arg = '<?xml version="1.0"?><foo></foo>';
+                luen(arg).find('foo').ajaxLoad(window.location + ' h1', function(data, xhr, opt) {
+                    assertSame(opt.type, 'rawText');
+                })
+            });
+
+            // plugins
+            test('plugins query assertSame', function() {
+                var arg = '#test_div';
+                luen.fn.somePlugin = function() {
+                    this.setAttribute('data-plugin', 'luen');
+                    return this;
+                }
+                assertSame(luen(arg).somePlugin().getAttribute('data-plugin'), 'luen');
+                jQuery.fn.somePlugin = function() {
+                    this.attr('data-plugin', 'jQuery');
+                    return this;
+                }
+                assertSame(jQuery(arg).somePlugin().attr('data-plugin'), 'jQuery');
+            });
+
+            test('plugins fn extend assertSame', function() {
+                var obj = {
+                    funcfunc: function() {
+                        return 123;
+                    }
+                };
+                luen.fn.extend(obj);
+                assertSame(luen('body').funcfunc(), 123);
+                jQuery.fn.extend(obj);
+                assertSame(jQuery('body').funcfunc(), 123);
+            });
+        </script>
+    </body>
+</html>
