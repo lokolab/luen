@@ -3,6 +3,13 @@
  *
  * Copyright (c) Krystian Pietruszka <kpietru@lokolab.net>
  * License MIT
+ *
+ * Inspirations
+ * - jQuery JavaScript Library v2.2.4
+ *   http://jquery.com/
+ * - Cookie Functions -- "Night of the Living Cookie" Version (25-Jul-96)
+ *   Written by:  Bill Dortch, hIdaho Design <bdortch@hidaho.com>
+ *   http://www.cookiecentral.com/code/cookie.txt
  */
 
 'use strict';
