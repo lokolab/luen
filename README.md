@@ -22,9 +22,9 @@ luen
 - Homepage: <http://www.lokolab.net>
 
 Luen JavaScript library with a friendly API.
-Inspirations [jQuery JavaScript Library (v2.2.4)] (http://jquery.com)
-and [Cookie Functions -- "Night of the Living Cookie" (version 25-Jul-96)]
-(http://www.cookiecentral.com/code/cookie.txt) written by: Bill Dortch.
+Inspirations jQuery JavaScript Library (v2.2.4)
+and Cookie Functions -- "Night of the Living Cookie" (25-Jul-96)
+written by: Bill Dortch.
 ____________________________________________
 
 Example usage
