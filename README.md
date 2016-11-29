@@ -22,8 +22,10 @@ luen
 - Homepage: <http://www.lokolab.net>
 
 Luen JavaScript library with a friendly API.
-Inspirations [jQuery][1] and [cook][6]
-____________________________________________
+
+Inspired by [jQuery JavaScript Library][7] and
+[Cookie Functions -- "Night of the Living Cookie"][6]
+_____________________________________________________
 
 Example usage
 -------------
