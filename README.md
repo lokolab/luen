@@ -22,6 +22,12 @@ luen
 - Homepage: <http://www.lokolab.net>
 
 Luen JavaScript library with a friendly API.
+Inspirations
+  jQuery JavaScript Library v2.2.4
+  http://jquery.com/
+- Cookie Functions -- "Night of the Living Cookie" Version (25-Jul-96)
+  Written by:  Bill Dortch, hIdaho Design <bdortch@hidaho.com>
+  http://www.java2s.com/Code/JavaScript/Development/BillDortchsCookieFunctions.htm
 ____________________________________________
 
 Example usage
@@ -133,11 +139,11 @@ API
 - luen.VERSION: string
 - luen.REGEX_NOT_WHITE: object
 - luen.fn: object
+- luen.selector ( string: __query__, undefined|object: __context__, undefined|boolean: __internal__ ): object
 - luen.extend ( object: __obj1__, object: __obj2__ ): object
 - luen.each ( object: __obj__, function: __callback__ ): object
 - luen.hasParam ( string: __key__, undefined|string: __params__ ): boolean
 - luen.getParam ( string: __key__, undefined|string: __params__ ): undefined|string
-- luen.selector ( string: __query__, undefined|object: __context__, undefined|boolean: __internal__ ): object
 - luen.parse ( string: __str__, string: __type__ ): object
 - luen.parseXml ( string: __str__ ): object
 - luen.parseHtml ( string: __str__ ): object
@@ -145,13 +151,6 @@ API
 - luen.parseParams ( string: __str__ ): object
 - luen.parseDom ( string: __str__ ): object
 - luen.jsonToString ( object: __obj__ ): string
-- luen.effects: object
-  - fade: object
-    - show ( object: __elem__, undefined|number|function: __milisec__ ): luen
-    - hide ( object: __elem__, undefined|number|function: __milisec__ ): luen
-  - fadeX: object
-    - show ( object: __elem__, undefined|number|function: __milisec__ ): luen
-    - hide ( object: __elem__, undefined|number|function: __milisec__ ): luen
 - luen.ajax ( string: __url__, undefined|object: __options__ ): object
   - done ( undefined|function: __success__ ): XMLHttpRequest
 - luen.ajaxPost ( string: __url__, undefined|string|object|function: __params__, undefined|string|function: __success__, undefined|string: __type__ ): XMLHttpRequest
@@ -164,6 +163,10 @@ API
 - luen.setCookie ( string: __key__, string: __value__, undefined|number|string: __expires__, undefined|string: __path__, undefined|string: __domain__, undefined|boolean: __secure__ ): luen
 - luen.getCookie ( string: __key__ ): undefined|string
 - luen.removeCookie ( string: __key__, undefined|string: __path__, undefined|string: __domain__ ): luen
+- luen.effects: object
+  - fade: object
+    - show ( object: __elem__, undefined|number|function: __milisec__ ): luen
+    - hide ( object: __elem__, undefined|number|function: __milisec__ ): luen
 - luen.assertType ( *, *, ... ): *
 
 References
