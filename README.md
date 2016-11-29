@@ -182,3 +182,4 @@ References
 [4]: http://developer.microsoft.com/en-us/microsoft-edge/tools/screenshots/
 [5]: http://browsershots.org
 [6]: http://www.cookiecentral.com/code/cookie.txt
+[7]: http://ll.kk
