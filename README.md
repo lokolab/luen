@@ -22,9 +22,7 @@ luen
 - Homepage: <http://www.lokolab.net>
 
 Luen JavaScript library with a friendly API.
-Inspirations jQuery JavaScript Library (v2.2.4)
-and Cookie Functions -- "Night of the Living Cookie" (25-Jul-96)
-written by: Bill Dortch.
+Inspirations [jQuery][1] and [cook][6]
 ____________________________________________
 
 Example usage
@@ -174,9 +172,11 @@ References
 3. [Ajax z Access-Control-Allow-Origin][3]
 4. [Browser screenshots][4]
 5. [Browser shots][5]
+6. [Cookie Functions -- "Night of the Living Cookie"][6]
 
-[1]: http://google.github.io/styleguide/javascriptguide.xml
+[1]: http://google.github.io/styleguide/jsguide.html
 [2]: http://www.w3schools.com/jsref/dom_obj_all.asp
 [3]: http://www.yarpo.pl/2011/05/06/ajax-z-access-control-allow-origin/
 [4]: http://developer.microsoft.com/en-us/microsoft-edge/tools/screenshots/
 [5]: http://browsershots.org
+[6]: http://www.cookiecentral.com/code/cookie.txt
