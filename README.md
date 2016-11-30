@@ -21,11 +21,9 @@ luen
 - Download: <https://github.com/lokolab/luen/releases>
 - Homepage: <http://www.lokolab.net>
 
-Luen JavaScript library with a friendly API.
-
-Inspired by [jQuery JavaScript Library][7] and
-[Cookie Functions -- "Night of the Living Cookie"][6]
-_____________________________________________________
+Luen JavaScript library with a friendly API.<br>
+Inspired by [jQuery JavaScript Library (v2.2.4)][7] and
+[Cookie Functions -- "Night of the Living Cookie" Version (25-Jul-96)][6].
 
 Example usage
 -------------
